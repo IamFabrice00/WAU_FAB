@@ -1,0 +1,599 @@
+/* ==========================================================================
+   PRESENTAZIONE CONFERENZA - MAPPA MENTALE CIRCOLARE (7 NODI)
+   Design: Minimale, Elegante, Dark Mode (#0e0e11)
+   ========================================================================== */
+
+:root {
+  --bg-color: #0e0e11;
+  --bg-gradient: radial-gradient(circle at 50% 50%, #171822 0%, #0e0e11 65%, #070709 100%);
+  --line-color: rgba(147, 197, 253, 0.35);
+  --line-hover: rgba(167, 139, 250, 0.85);
+  --node-border: rgba(255, 255, 255, 0.4);
+  --node-border-hover: rgba(255, 255, 255, 0.95);
+  --node-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(99, 179, 237, 0.2);
+  --node-shadow-hover: 0 16px 45px rgba(0, 0, 0, 0.9), 0 0 35px rgba(167, 139, 250, 0.5);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --transition-smooth: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-color);
+  background: var(--bg-gradient);
+  font-family: var(--font-family);
+  color: #ffffff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none; /* Previene scroll nativo e gesture indesiderate */
+}
+
+/* ==========================================================================
+   VIEWPORT PRINCIPALE E STAGE INTERATTIVO
+   ========================================================================== */
+
+.app-viewport {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+/* ==========================================================================
+   MENU HAMBURGER SOCIAL (IN ALTO A DESTRA)
+   ========================================================================== */
+
+.social-nav {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  z-index: 60;
+  pointer-events: auto;
+}
+
+/* Pulsante Hamburger minimalista in vetro */
+.hamburger-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 15px rgba(255, 255, 255, 0.04);
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.hamburger-btn:hover,
+.hamburger-btn:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.06);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(99, 179, 237, 0.25);
+}
+
+.hamburger-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 3px;
+}
+
+.hamburger-bar {
+  display: block;
+  width: 19px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease, background-color var(--transition-smooth);
+  transform-origin: center;
+}
+
+/* Animazione di trasformazione in 'X' quando aperto */
+.social-nav.is-open .hamburger-btn {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.social-nav.is-open .hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.social-nav.is-open .hamburger-bar:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.social-nav.is-open .hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Menu a comparsa (Dropdown Glassmorphism) */
+.social-menu {
+  position: absolute;
+  top: 54px;
+  right: 0;
+  min-width: 210px;
+  background: rgba(14, 15, 23, 0.92);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(99, 179, 237, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-10px) scale(0.95);
+  transform-origin: top right;
+  transition: opacity 240ms cubic-bezier(0.16, 1, 0.3, 1), transform 240ms cubic-bezier(0.16, 1, 0.3, 1), visibility 240ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.social-nav.is-open .social-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+/* Singoli elementi social nel menu */
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  text-decoration: none;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  color: #ffffff;
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.social-item:hover,
+.social-item:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateX(-2px);
+  outline: none;
+}
+
+.social-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.social-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Stile WhatsApp */
+.whatsapp-icon {
+  background: rgba(37, 211, 102, 0.14);
+  color: #25d366;
+  border: 1px solid rgba(37, 211, 102, 0.3);
+}
+
+.whatsapp-link:hover .whatsapp-icon,
+.whatsapp-link:focus-visible .whatsapp-icon {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(37, 211, 102, 0.5);
+  background: rgba(37, 211, 102, 0.22);
+}
+
+/* Stile Instagram */
+.instagram-icon {
+  background: linear-gradient(135deg, rgba(245, 133, 41, 0.18), rgba(221, 42, 123, 0.18), rgba(129, 52, 175, 0.18));
+  color: #f7708c;
+  border: 1px solid rgba(221, 42, 123, 0.35);
+}
+
+.instagram-link:hover .instagram-icon,
+.instagram-link:focus-visible .instagram-icon {
+  transform: scale(1.1);
+  box-shadow: 0 0 16px rgba(221, 42, 123, 0.5);
+  background: linear-gradient(135deg, rgba(245, 133, 41, 0.26), rgba(221, 42, 123, 0.26), rgba(129, 52, 175, 0.26));
+}
+
+.social-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.social-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.social-desc {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-muted);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* Stage che contiene linee e nodi: sincronizzato in coordinate 0,0 al centro */
+.mindmap-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  will-change: transform;
+  pointer-events: none; /* Gli eventi di drag passano al viewport, i nodi abilitano pointer-events */
+}
+
+/* ==========================================================================
+   LINEE DI COLLEGAMENTO SVG (ANELLO CHIUSO A 7 VERTICI)
+   ========================================================================== */
+
+.connections-svg {
+  position: absolute;
+  top: -1500px;
+  left: -1500px;
+  width: 3000px;
+  height: 3000px;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.ring-polygon {
+  fill: none;
+  stroke: var(--line-color);
+  stroke-width: 1.8;
+  stroke-dasharray: 8 4;
+  filter: drop-shadow(0 0 8px rgba(99, 179, 237, 0.3));
+  transition: stroke var(--transition-smooth);
+}
+
+.joint-point {
+  fill: #63b3ed;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 6px #63b3ed);
+}
+
+/* ==========================================================================
+   NODI CIRCOLARI (7 CERCHI STATICI)
+   ========================================================================== */
+
+.nodes-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 2;
+}
+
+.node-wrapper {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.node-btn {
+  position: relative;
+  display: block;
+  width: var(--node-size, 110px);
+  height: var(--node-size, 110px);
+  border-radius: 50%;
+  background: #14151f;
+  border: 1.5px solid var(--node-border);
+  box-shadow: var(--node-shadow);
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  transform: scale(1);
+  transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Effetto lente / riflesso sottile */
+.node-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 65%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Immagine interna ritagliata perfettamente a cerchio */
+.node-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+  transition: transform var(--transition-smooth), filter var(--transition-smooth);
+  filter: contrast(1.05) brightness(0.95);
+  pointer-events: none;
+}
+
+/* 2. Zoom sul singolo cerchio al passaggio del mouse (hover ~1.1x) */
+.node-btn:hover,
+.node-btn:focus-visible {
+  transform: scale(1.12);
+  border-color: var(--node-border-hover);
+  box-shadow: var(--node-shadow-hover);
+  z-index: 10;
+}
+
+.node-btn:hover img,
+.node-btn:focus-visible img {
+  filter: contrast(1.1) brightness(1.08);
+}
+
+.node-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+}
+
+/* Piccolo badge numerico / indice elegante stile conferenza */
+.node-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  background: rgba(14, 14, 17, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.9);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ==========================================================================
+   INDICAZIONE DISCRETA CONTROLLI
+   ========================================================================== */
+
+.quick-hint {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  background: rgba(20, 21, 31, 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  pointer-events: none;
+  opacity: 0.75;
+  transition: opacity 400ms ease;
+  z-index: 5;
+}
+
+.hint-dot {
+  opacity: 0.35;
+}
+
+/* ==========================================================================
+   3. LIGHTBOX CON SFONDO SCURITO, SFOCATO E ZOOM INTERNO
+   ========================================================================== */
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 280ms cubic-bezier(0.16, 1, 0.3, 1), visibility 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lightbox.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Sfondo scurito e sfocato (backdrop-filter) */
+.lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(8, 8, 12, 0.88);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  cursor: pointer;
+}
+
+/* Piccola "X" in alto a destra */
+.lightbox-close {
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 110;
+  outline: none;
+  transition: background var(--transition-smooth), transform var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.lightbox-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: rgba(255, 255, 255, 0.85);
+  transition: stroke var(--transition-smooth);
+}
+
+.lightbox-close:hover,
+.lightbox-close:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: scale(1.08);
+}
+
+.lightbox-close:hover svg {
+  stroke: #ffffff;
+}
+
+.lightbox-close:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+/* Contenitore immagine ingrandita */
+.lightbox-wrapper {
+  position: relative;
+  z-index: 105;
+  max-width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.lightbox-image-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: scale(0.92);
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.lightbox.is-open .lightbox-image-box {
+  transform: scale(1);
+}
+
+/* Immagine ingrandita al centro con supporto a zoom e pan interni */
+.lightbox-img {
+  max-width: 82vw;
+  max-height: 76vh;
+  object-fit: contain;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 50px rgba(99, 179, 237, 0.12);
+  cursor: zoom-in;
+  transition: transform 120ms ease-out;
+  transform-origin: center center;
+  will-change: transform;
+  display: block;
+}
+
+.lightbox-img.is-zoomed {
+  cursor: grab;
+}
+
+.lightbox-img.is-zoomed:active {
+  cursor: grabbing;
+}
+
+/* Didascalia minimale ed elegante */
+.lightbox-caption {
+  margin-top: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(18, 19, 27, 0.65);
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (PROIETTORE 16:9, DESKTOP, TABLET, SMARTPHONE)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .social-nav {
+    top: 16px;
+    right: 16px;
+  }
+
+  .hamburger-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .social-menu {
+    top: 48px;
+    min-width: 190px;
+  }
+
+  .quick-hint {
+    font-size: 10px;
+    padding: 6px 12px;
+    bottom: 16px;
+    gap: 6px;
+  }
+  
+  .lightbox-close {
+    top: 16px;
+    right: 16px;
+    width: 38px;
+    height: 38px;
+  }
+}

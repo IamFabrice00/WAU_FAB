@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Presentazione Progetto | Mappa Concettuale Circolare</title>
+  <meta name="description" content="Presentazione interattiva a schermo intero per conferenza: anello circolare con 7 nodi multimediali, zoom, pan e lightbox.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Area principale interattiva a schermo intero -->
+  <main id="app-viewport" class="app-viewport" aria-label="Mappa concettuale del progetto">
+    
+    <!-- Menu Hamburger Social in alto a destra -->
+    <div id="social-nav" class="social-nav">
+      <button id="hamburger-btn" class="hamburger-btn" aria-label="Apri menu social" aria-expanded="false" aria-controls="social-menu">
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+
+      <div id="social-menu" class="social-menu" role="menu" aria-label="Canali social e contatti">
+        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="social-item whatsapp-link" role="menuitem" aria-label="WhatsApp">
+          <span class="social-icon whatsapp-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.11 7.02C8.94 7.02 8.68 7.08 8.44 7.34C8.21 7.6 7.56 8.21 7.56 9.46C7.56 10.71 8.47 11.91 8.6 12.08C8.73 12.26 10.37 14.93 13 15.96C15.19 16.81 15.64 16.64 16.11 16.6C16.58 16.56 17.62 15.98 17.84 15.38C18.06 14.77 18.06 14.25 18 14.15C17.94 14.05 17.77 13.99 17.51 13.86C17.25 13.73 15.98 13.1 15.74 13.01C15.51 12.93 15.34 12.89 15.17 13.15C15 13.41 14.53 13.99 14.38 14.15C14.23 14.32 14.08 14.34 13.82 14.21C13.56 14.08 12.73 13.81 11.74 12.93C10.97 12.24 10.45 11.39 10.3 11.13C10.15 10.87 10.28 10.73 10.41 10.6C10.53 10.48 10.68 10.29 10.81 10.14C10.94 9.99 10.98 9.88 11.07 9.71C11.16 9.54 11.11 9.39 11.05 9.26C10.99 9.13 10.51 7.97 10.32 7.49C10.13 7.02 9.94 7.08 9.79 7.07C9.65 7.06 9.48 7.02 9.11 7.02Z"/>
+            </svg>
+          </span>
+          <div class="social-text">
+            <span class="social-name">WhatsApp</span>
+            <span class="social-desc">Contattaci subito</span>
+          </div>
+        </a>
+
+        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" class="social-item instagram-link" role="menuitem" aria-label="Instagram">
+          <span class="social-icon instagram-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+            </svg>
+          </span>
+          <div class="social-text">
+            <span class="social-name">Instagram</span>
+            <span class="social-desc">Segui il profilo</span>
+          </div>
+        </a>
+      </div>
+    </div>
+    
+    <!-- Stage scalabile e traslabile per Zoom & Pan sincronizzati -->
+    <div id="mindmap-stage" class="mindmap-stage">
+      
+      <!-- Linee di connessione SVG (chiuse ad anello tra i 7 nodi) -->
+      <svg id="connections-svg" class="connections-svg" aria-hidden="true">
+        <defs>
+          <!-- Filtro bagliore elegante per le linee in stile mappa mentale -->
+          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <linearGradient id="line-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#4fd1c5" stop-opacity="0.8" />
+            <stop offset="50%" stop-color="#63b3ed" stop-opacity="0.9" />
+            <stop offset="100%" stop-color="#b794f4" stop-opacity="0.8" />
+          </linearGradient>
+        </defs>
+        <!-- Poligono di collegamento principale -->
+        <polygon id="ring-polygon" class="ring-polygon" points="" />
+        <!-- Giunzioni / nodi secondari decorativi sui vertici -->
+        <g id="joints-group" class="joints-group"></g>
+      </svg>
+
+      <!-- Contenitore dei 7 nodi circolari interattivi -->
+      <div id="nodes-container" class="nodes-container" role="region" aria-label="Nodi del progetto">
+        <!-- Generati dinamicamente da script.js -->
+      </div>
+    </div>
+
+    <!-- Indicatore discreto controlli (focalizzato sull'esperienza conferenza) -->
+    <div id="quick-hint" class="quick-hint" aria-hidden="true">
+      <span>Rotella / Pinch: Zoom</span>
+      <span class="hint-dot">•</span>
+      <span>Trascina: Sposta</span>
+      <span class="hint-dot">•</span>
+      <span>Doppio Click: Ripristina</span>
+    </div>
+
+    <!-- Lightbox a tutto schermo -->
+    <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Dettaglio nodo del progetto" aria-hidden="true">
+      <div id="lightbox-backdrop" class="lightbox-backdrop"></div>
+      
+      <button id="lightbox-close" class="lightbox-close" aria-label="Chiudi dettaglio (ESC)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <div class="lightbox-wrapper">
+        <div id="lightbox-image-box" class="lightbox-image-box">
+          <img id="lightbox-image" src="" alt="" draggable="false" class="lightbox-img" />
+          <div id="lightbox-caption" class="lightbox-caption"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
