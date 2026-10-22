@@ -108,6 +108,12 @@ const nodesContainerEl = document.getElementById('nodes-container');
 const ringPolygonEl = document.getElementById('ring-polygon');
 const jointsGroupEl = document.getElementById('joints-group');
 
+// Elementi Cervello 3D e Connessioni Radiali
+const brainWrapperEl = document.getElementById('brain-3d-wrapper');
+const brainCanvasEl = document.getElementById('brain-canvas');
+const radialLinesGroupEl = document.getElementById('radial-connections-group');
+const radialPulsesGroupEl = document.getElementById('radial-pulses-group');
+
 const lightboxEl = document.getElementById('lightbox');
 const lightboxBackdropEl = document.getElementById('lightbox-backdrop');
 const lightboxCloseEl = document.getElementById('lightbox-close');
@@ -137,12 +143,56 @@ function closeSocialMenu() {
 }
 
 // ============================================================================
-// 1. INIZIALIZZAZIONE & CALCOLO TRIGONOMETRICO DEI NODI (7 CERCHI)
+// 1. INIZIALIZZAZIONE & CALCOLO TRIGONOMETRICO DEI NODI E CONNESSIONI AL CERVELLO
 // ============================================================================
 
 /**
+ * Evidenzia la linea di connessione radiale tra il cervello 3D e il nodo
+ */
+function highlightRadialConnection(index, active) {
+  const line = document.getElementById(`radial-line-${index}`);
+  if (line) {
+    line.classList.toggle('is-active', active);
+  }
+  const pulse = document.getElementById(`radial-pulse-${index}`);
+  if (pulse) {
+    pulse.classList.toggle('is-active', active);
+  }
+  if (window.Brain3D && typeof Brain3D.highlightConnection === 'function') {
+    Brain3D.highlightConnection(index, active);
+  }
+}
+
+/**
+ * Attiva una scarica di shockwave bioelettrica dal cervello verso tutti i nodi
+ */
+function triggerBrainShockwave() {
+  if (!brainWrapperEl) return;
+  brainWrapperEl.classList.remove('is-shockwave');
+  void brainWrapperEl.offsetWidth; // Forza reflow CSS per restart animazione
+  brainWrapperEl.classList.add('is-shockwave');
+
+  if (window.Brain3D && typeof Brain3D.triggerShockwave === 'function') {
+    Brain3D.triggerShockwave();
+  }
+
+  // Flash simultaneo di tutte le 7 connessioni radiali
+  for (let i = 0; i < NODES_DATA.length; i++) {
+    const line = document.getElementById(`radial-line-${i}`);
+    if (line) line.classList.add('is-active');
+  }
+
+  setTimeout(() => {
+    for (let i = 0; i < NODES_DATA.length; i++) {
+      const line = document.getElementById(`radial-line-${i}`);
+      if (line) line.classList.remove('is-active');
+    }
+  }, 500);
+}
+
+/**
  * Calcola le dimensioni e le coordinate (x, y) dei 7 cerchi
- * disposti uniformemente su una circonferenza immaginaria (~51.4° ciascuno).
+ * e le linee di connessione al cervello 3D centrale.
  */
 function layoutRing() {
   const count = NODES_DATA.length; // 7
@@ -151,12 +201,20 @@ function layoutRing() {
   const minDim = Math.min(vw, vh);
 
   // Raggio responsive proporzionato alla finestra
-  // ~35% della dimensione minima, bilanciato tra schermi piccoli e 4K
   const radius = Math.max(130, Math.min(380, minDim * 0.34));
   const nodeSize = Math.max(68, Math.min(130, minDim * 0.135));
 
-  // Imposta la variabile CSS per il diametro dei cerchi
+  // Dimensione responsive del cervello 3D (bilanciata all'interno dell'anello)
+  const brainSize = Math.max(120, Math.min(270, radius * 0.82));
+
+  // Imposta le variabili CSS per il diametro dei cerchi e del cervello
   document.documentElement.style.setProperty('--node-size', `${nodeSize}px`);
+  document.documentElement.style.setProperty('--brain-size', `${brainSize}px`);
+
+  // Ridimensiona il motore 3D WebGL se già attivo
+  if (window.Brain3D && typeof Brain3D.resize === 'function') {
+    Brain3D.resize(brainSize);
+  }
 
   // Angolo di partenza: -PI/2 (-90°) per posizionare il nodo 1 in alto al centro (12 o'clock)
   const startAngle = -Math.PI / 2;
@@ -164,6 +222,8 @@ function layoutRing() {
 
   const points = [];
   jointsGroupEl.innerHTML = '';
+  if (radialLinesGroupEl) radialLinesGroupEl.innerHTML = '';
+  if (radialPulsesGroupEl) radialPulsesGroupEl.innerHTML = '';
 
   for (let i = 0; i < count; i++) {
     const angle = startAngle + i * angleStep;
@@ -177,13 +237,53 @@ function layoutRing() {
       wrapper.style.transform = `translate(${x}px, ${y}px)`;
     }
 
-    // Aggiungi piccolo punto di giunzione sull'SVG
+    // Aggiungi piccolo punto di giunzione sull'SVG periferico
     const jointCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     jointCircle.setAttribute('cx', x);
     jointCircle.setAttribute('cy', y);
     jointCircle.setAttribute('r', '3');
     jointCircle.setAttribute('class', 'joint-point');
     jointsGroupEl.appendChild(jointCircle);
+
+    // 1. Linea di connessione neurale radiale dal centro del cervello (0, 0) al nodo (x, y)
+    if (radialLinesGroupEl) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('id', `radial-line-${i}`);
+      line.setAttribute('class', 'radial-connection-line');
+      line.setAttribute('x1', '0');
+      line.setAttribute('y1', '0');
+      line.setAttribute('x2', x);
+      line.setAttribute('y2', y);
+      radialLinesGroupEl.appendChild(line);
+    }
+
+    // 2. Impulsi e particelle sinaptiche che viaggiano dal cervello verso il nodo
+    if (radialPulsesGroupEl) {
+      // Impulso primario
+      const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot.setAttribute('id', `radial-pulse-${i}`);
+      dot.setAttribute('class', 'radial-pulse-dot');
+      dot.setAttribute('r', '2.6');
+      const anim = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+      anim.setAttribute('path', `M 0,0 L ${x},${y}`);
+      anim.setAttribute('dur', `${2.2 + (i % 3) * 0.35}s`);
+      anim.setAttribute('repeatCount', 'indefinite');
+      dot.appendChild(anim);
+      radialPulsesGroupEl.appendChild(dot);
+
+      // Impulso secondario ritardato per ritmo biologico
+      const dot2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      dot2.setAttribute('class', 'radial-pulse-dot');
+      dot2.setAttribute('r', '1.8');
+      dot2.style.opacity = '0.55';
+      const anim2 = document.createElementNS('http://www.w3.org/2000/svg', 'animateMotion');
+      anim2.setAttribute('path', `M 0,0 L ${x},${y}`);
+      anim2.setAttribute('dur', `${2.2 + (i % 3) * 0.35}s`);
+      anim2.setAttribute('begin', `${1.1 + (i % 3) * 0.18}s`);
+      anim2.setAttribute('repeatCount', 'indefinite');
+      dot2.appendChild(anim2);
+      radialPulsesGroupEl.appendChild(dot2);
+    }
   }
 
   // Genera punti del poligono SVG per l'anello chiuso
@@ -226,6 +326,12 @@ function createNodeElements() {
     wrapper.appendChild(button);
     nodesContainerEl.appendChild(wrapper);
 
+    // Reazione visiva tra nodo e cervello 3D al mouseenter/mouseleave e focus/blur
+    button.addEventListener('mouseenter', () => highlightRadialConnection(index, true));
+    button.addEventListener('mouseleave', () => highlightRadialConnection(index, false));
+    button.addEventListener('focus', () => highlightRadialConnection(index, true));
+    button.addEventListener('blur', () => highlightRadialConnection(index, false));
+
     // Evento click per apertura lightbox (controlla che non fosse un drag)
     button.addEventListener('click', (e) => {
       if (state.dragDistance > 6) {
@@ -254,6 +360,8 @@ function updateStageTransform(smooth = false) {
     stageEl.style.transition = 'none';
   }
   stageEl.style.transform = `translate3d(${state.panX}px, ${state.panY}px, 0) scale(${state.zoom})`;
+  // Quando ingrandito, il touch sposta lo stage invece di scorrere la pagina
+  viewportEl.classList.toggle('is-zoomed', state.zoom > 1.01);
 }
 
 /**
@@ -261,6 +369,8 @@ function updateStageTransform(smooth = false) {
  */
 function handleViewportWheel(e) {
   if (state.lightbox.isOpen) return; // Se lightbox è aperta, non zoomare lo stage
+  // Rotella semplice = scorrimento pagina; Ctrl/⌘ + rotella (o pinch su trackpad) = zoom
+  if (!e.ctrlKey && !e.metaKey) return;
   e.preventDefault();
 
   const zoomFactor = e.deltaY < 0 ? 1.12 : 0.89;
@@ -364,12 +474,15 @@ function handleTouchStart(e) {
 
 function handleTouchMove(e) {
   if (state.lightbox.isOpen) return;
-  e.preventDefault();
 
   for (let i = 0; i < e.changedTouches.length; i++) {
     const t = e.changedTouches[i];
     state.activeTouches.set(t.identifier, { x: t.clientX, y: t.clientY });
   }
+
+  // A zoom 1x un solo dito scorre la pagina in modo nativo
+  if (state.activeTouches.size === 1 && state.zoom <= 1.01) return;
+  if (e.cancelable) e.preventDefault();
 
   if (state.activeTouches.size === 1) {
     const t = e.changedTouches[0];
@@ -622,6 +735,22 @@ function setupEventListeners() {
   window.addEventListener('mousemove', handleLightboxImgPointerMove);
   window.addEventListener('mouseup', handleLightboxImgPointerUp);
   lightboxImgEl.addEventListener('dblclick', handleLightboxImgDoubleClick);
+
+  // Interazione Click e Tastiera sul Cervello 3D Centrale
+  if (brainWrapperEl) {
+    brainWrapperEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (state.dragDistance > 6) return;
+      triggerBrainShockwave();
+    });
+
+    brainWrapperEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        triggerBrainShockwave();
+      }
+    });
+  }
 }
 
 // Avvio applicazione
@@ -630,4 +759,25 @@ document.addEventListener('DOMContentLoaded', () => {
   layoutRing();
   setupEventListeners();
   updateStageTransform(false);
+
+  // Inizializzazione motore 3D WebGL (Three.js) per il Cervello Neurale
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const minDim = Math.min(vw, vh);
+  const radius = Math.max(130, Math.min(380, minDim * 0.34));
+  const initialBrainSize = Math.max(120, Math.min(270, radius * 0.82));
+
+  if (window.Brain3D && brainCanvasEl && brainWrapperEl) {
+    const brainReady = Brain3D.init(brainCanvasEl, brainWrapperEl, initialBrainSize);
+
+    // Mette in pausa il rendering WebGL quando la mappa esce dallo schermo
+    if (brainReady && 'IntersectionObserver' in window) {
+      new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) Brain3D.start();
+          else Brain3D.stop();
+        });
+      }).observe(viewportEl);
+    }
+  }
 });

@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="pioneers.css">
 </head>
 <body>
   <!-- Area principale interattiva a schermo intero -->
@@ -23,7 +24,7 @@
       </button>
 
       <div id="social-menu" class="social-menu" role="menu" aria-label="Canali social e contatti">
-        <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" class="social-item whatsapp-link" role="menuitem" aria-label="WhatsApp">
+        <a href="https://wa.me/393201463710" target="_blank" rel="noopener noreferrer" class="social-item whatsapp-link" role="menuitem" aria-label="WhatsApp: +39 320 146 3710">
           <span class="social-icon whatsapp-icon">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.04 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 14.99 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.11 7.02C8.94 7.02 8.68 7.08 8.44 7.34C8.21 7.6 7.56 8.21 7.56 9.46C7.56 10.71 8.47 11.91 8.6 12.08C8.73 12.26 10.37 14.93 13 15.96C15.19 16.81 15.64 16.64 16.11 16.6C16.58 16.56 17.62 15.98 17.84 15.38C18.06 14.77 18.06 14.25 18 14.15C17.94 14.05 17.77 13.99 17.51 13.86C17.25 13.73 15.98 13.1 15.74 13.01C15.51 12.93 15.34 12.89 15.17 13.15C15 13.41 14.53 13.99 14.38 14.15C14.23 14.32 14.08 14.34 13.82 14.21C13.56 14.08 12.73 13.81 11.74 12.93C10.97 12.24 10.45 11.39 10.3 11.13C10.15 10.87 10.28 10.73 10.41 10.6C10.53 10.48 10.68 10.29 10.81 10.14C10.94 9.99 10.98 9.88 11.07 9.71C11.16 9.54 11.11 9.39 11.05 9.26C10.99 9.13 10.51 7.97 10.32 7.49C10.13 7.02 9.94 7.08 9.79 7.07C9.65 7.06 9.48 7.02 9.11 7.02Z"/>
@@ -31,11 +32,11 @@
           </span>
           <div class="social-text">
             <span class="social-name">WhatsApp</span>
-            <span class="social-desc">Contattaci subito</span>
+            <span class="social-desc">+39 320 146 3710</span>
           </div>
         </a>
 
-        <a href="https://instagram.com/" target="_blank" rel="noopener noreferrer" class="social-item instagram-link" role="menuitem" aria-label="Instagram">
+        <a href="https://www.instagram.com/iam_fabrice_00?obrf=Y3U3dHV6b2VnZWoy&amp;utm_source=qr" target="_blank" rel="noopener noreferrer" class="social-item instagram-link" role="menuitem" aria-label="Instagram: @iam_fabrice_00">
           <span class="social-icon instagram-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
@@ -45,7 +46,7 @@
           </span>
           <div class="social-text">
             <span class="social-name">Instagram</span>
-            <span class="social-desc">Segui il profilo</span>
+            <span class="social-desc">@iam_fabrice_00</span>
           </div>
         </a>
       </div>
@@ -54,12 +55,28 @@
     <!-- Stage scalabile e traslabile per Zoom & Pan sincronizzati -->
     <div id="mindmap-stage" class="mindmap-stage">
       
-      <!-- Linee di connessione SVG (chiuse ad anello tra i 7 nodi) -->
+      <!-- Cervello 3D Centrale Connesso ai 7 Nodi -->
+      <div id="brain-3d-wrapper" class="brain-3d-wrapper" role="button" tabindex="0" aria-label="Cervello 3D neurale: Clicca per sincronizzare i 7 nodi del progetto">
+        <div class="brain-ambient-glow" aria-hidden="true"></div>
+        <canvas id="brain-canvas" class="brain-canvas"></canvas>
+        <div class="brain-hud-badge" aria-hidden="true">
+          <span class="brain-hud-text">WAU TECH</span>
+        </div>
+      </div>
+
+      <!-- Linee di connessione SVG (anello periferico e raggi neurali dal cervello) -->
       <svg id="connections-svg" class="connections-svg" aria-hidden="true">
         <defs>
-          <!-- Filtro bagliore elegante per le linee in stile mappa mentale -->
+          <!-- Filtro bagliore per le linee in stile mappa mentale -->
           <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <filter id="brain-glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feGaussianBlur stdDeviation="5" result="blur" />
             <feMerge>
               <feMergeNode in="blur" />
               <feMergeNode in="SourceGraphic" />
@@ -70,7 +87,17 @@
             <stop offset="50%" stop-color="#63b3ed" stop-opacity="0.9" />
             <stop offset="100%" stop-color="#b794f4" stop-opacity="0.8" />
           </linearGradient>
+          <linearGradient id="radial-grad-base" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.95" />
+            <stop offset="45%" stop-color="#818cf8" stop-opacity="0.85" />
+            <stop offset="100%" stop-color="#c084fc" stop-opacity="0.6" />
+          </linearGradient>
         </defs>
+
+        <!-- Connessioni radiali dal cervello 3D verso i 7 nodi -->
+        <g id="radial-connections-group" class="radial-connections-group"></g>
+        <g id="radial-pulses-group" class="radial-pulses-group"></g>
+
         <!-- Poligono di collegamento principale -->
         <polygon id="ring-polygon" class="ring-polygon" points="" />
         <!-- Giunzioni / nodi secondari decorativi sui vertici -->
@@ -85,12 +112,19 @@
 
     <!-- Indicatore discreto controlli (focalizzato sull'esperienza conferenza) -->
     <div id="quick-hint" class="quick-hint" aria-hidden="true">
-      <span>Rotella / Pinch: Zoom</span>
+      <span>Ctrl + Rotella / Pinch: Zoom</span>
       <span class="hint-dot">•</span>
       <span>Trascina: Sposta</span>
       <span class="hint-dot">•</span>
       <span>Doppio Click: Ripristina</span>
     </div>
+
+    <!-- Pulsante per scorrere alla sezione Pionieri -->
+    <a id="scroll-cue" class="scroll-cue" href="#pioneers-section" aria-label="Scorri alla sezione Pionieri della Tecnologia">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </a>
 
     <!-- Lightbox a tutto schermo -->
     <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Dettaglio nodo del progetto" aria-hidden="true">
@@ -112,6 +146,105 @@
     </div>
   </main>
 
+  <!-- Sezione Pionieri: linea a serpente 2D con 5 nodi e card girevoli -->
+  <section id="pioneers-section" class="pioneers-section" aria-labelledby="pioneers-title">
+    <header class="pioneers-header">
+      <span class="pioneers-eyebrow">WAU TECH</span>
+      <h2 id="pioneers-title" class="pioneers-title">Pionieri della Tecnologia</h2>
+      <p class="pioneers-subtitle">Clicca sulla foto per ingrandirla • Clicca sullo spiralo in basso a destra per girare la card</p>
+    </header>
+
+    <div id="snake-track" class="snake-track">
+      <svg id="snake-svg" class="snake-svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="snake-gradient" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="50%" stop-color="#818cf8" />
+            <stop offset="100%" stop-color="#c084fc" />
+          </linearGradient>
+          <filter id="snake-blur" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+        </defs>
+        <!-- Linea del serpente (alone + tratto principale) -->
+        <path id="snake-path-glow" class="snake-path-glow" d="" />
+        <path id="snake-path" class="snake-path" d="" />
+        <!-- Piccoli connettori tra nodo e card -->
+        <g id="snake-stems" class="snake-stems"></g>
+        <!-- Impulsi luminosi che percorrono il serpente -->
+        <circle class="snake-pulse" r="3.5">
+          <animateMotion dur="9s" repeatCount="indefinite">
+            <mpath href="#snake-path" xlink:href="#snake-path" />
+          </animateMotion>
+        </circle>
+        <circle class="snake-pulse snake-pulse--soft" r="2.4">
+          <animateMotion dur="9s" repeatCount="indefinite" keyPoints="0.5;1;0;0.5" keyTimes="0;0.5;0.5;1" calcMode="linear">
+            <mpath href="#snake-path" xlink:href="#snake-path" />
+          </animateMotion>
+        </circle>
+      </svg>
+      <div id="snake-nodes" class="snake-nodes" aria-hidden="true"></div>
+      <div id="snake-cards" class="snake-cards">
+        <!-- Card generate dinamicamente da pioneers.js -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Spotlight Pioniere (Visualizzazione Ingrandita + Profilo d'Onore) -->
+  <div id="pioneer-modal" class="pioneer-modal" role="dialog" aria-modal="true" aria-label="Dettaglio Pioniere della Tecnologia" aria-hidden="true">
+    <div id="pioneer-modal-backdrop" class="pioneer-modal-backdrop"></div>
+    
+    <div class="pioneer-modal-wrapper">
+      <div class="pioneer-modal-card">
+        <!-- Pulsante di chiusura -->
+        <button id="pioneer-modal-close" class="pioneer-modal-close" aria-label="Chiudi dettaglio (ESC)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Frecce di navigazione tra i pionieri -->
+        <button id="pioneer-modal-prev" class="pioneer-modal-nav pioneer-modal-prev" aria-label="Pioniere precedente (Freccia Sinistra)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+        <button id="pioneer-modal-next" class="pioneer-modal-nav pioneer-modal-next" aria-label="Pioniere successivo (Freccia Destra)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <div class="pioneer-modal-body">
+          <!-- Colonna Sinistra: Ritratto in risalto con alone -->
+          <div class="pioneer-modal-media">
+            <div class="pioneer-modal-frame">
+              <img id="pioneer-modal-img" src="" alt="" draggable="false">
+            </div>
+            <span class="pioneer-modal-badge" id="pioneer-modal-count">01 / 05</span>
+          </div>
+
+          <!-- Colonna Destra: Nome, ruolo e biografia completa -->
+          <div class="pioneer-modal-info">
+            <span class="pioneer-modal-eyebrow" id="pioneer-modal-role"></span>
+            <h3 class="pioneer-modal-name" id="pioneer-modal-name"></h3>
+            <div class="pioneer-modal-divider" aria-hidden="true"></div>
+            <p class="pioneer-modal-bio" id="pioneer-modal-bio"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+  <script src="brain3d.js"></script>
   <script src="script.js"></script>
+  <script src="pioneers.js"></script>
 </body>
 </html>

@@ -1,0 +1,826 @@
+/* ==========================================================================
+   PIONIERI DELLA TECNOLOGIA - LINEA A SERPENTE 2D CON 5 CARD GIREVOLI
+   ========================================================================== */
+
+/* Pulsante per scorrere dalla mappa alla sezione Pionieri */
+.scroll-cue {
+  position: absolute;
+  right: 28px;
+  bottom: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: #bae6fd;
+  text-decoration: none;
+  z-index: 6;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.scroll-cue svg {
+  width: 20px;
+  height: 20px;
+  animation: scrollCueBounce 1.8s ease-in-out infinite;
+}
+
+.scroll-cue:hover,
+.scroll-cue:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: scale(1.06);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.6), 0 0 20px rgba(56, 189, 248, 0.3);
+  outline: none;
+}
+
+@keyframes scrollCueBounce {
+  0%, 100% { transform: translateY(-2px); }
+  50% { transform: translateY(3px); }
+}
+
+/* ==========================================================================
+   SEZIONE
+   ========================================================================== */
+
+.pioneers-section {
+  position: relative;
+  padding: clamp(64px, 10vh, 120px) clamp(16px, 4vw, 48px) clamp(72px, 12vh, 140px);
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #15161f 0%, #0e0e11 60%, #0a0a0d 100%);
+  overflow: hidden;
+}
+
+/* Sottile linea luminosa di separazione dalla mappa */
+.pioneers-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.45), rgba(192, 132, 252, 0.45), transparent);
+}
+
+.pioneers-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto clamp(40px, 7vh, 72px);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pioneers-section.is-visible .pioneers-header {
+  opacity: 1;
+  transform: none;
+}
+
+.pioneers-eyebrow {
+  display: inline-block;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+  color: #bae6fd;
+  background: rgba(14, 15, 23, 0.6);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 999px;
+}
+
+.pioneers-title {
+  margin-top: 16px;
+  font-size: clamp(28px, 4.2vw, 46px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(90deg, #e0f2fe 0%, #38bdf8 45%, #c084fc 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pioneers-subtitle {
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ==========================================================================
+   LINEA A SERPENTE
+   ========================================================================== */
+
+.snake-track {
+  position: relative;
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.snake-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.snake-path,
+.snake-path-glow {
+  fill: none;
+  stroke: url(#snake-gradient);
+  stroke-linecap: round;
+  stroke-dasharray: var(--snake-len);
+  stroke-dashoffset: var(--snake-len);
+  transition: stroke-dashoffset 2.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.snake-path {
+  stroke-width: 2.2;
+}
+
+.snake-path-glow {
+  stroke-width: 9;
+  opacity: 0.28;
+  filter: url(#snake-blur);
+}
+
+.pioneers-section.is-visible .snake-path,
+.pioneers-section.is-visible .snake-path-glow {
+  stroke-dashoffset: 0;
+}
+
+.snake-stem {
+  stroke: rgba(186, 230, 253, 0.35);
+  stroke-width: 1.2;
+  stroke-dasharray: 3 3;
+}
+
+.snake-pulse {
+  fill: #ffffff;
+  opacity: 0;
+  filter: drop-shadow(0 0 6px #38bdf8) drop-shadow(0 0 12px #818cf8);
+  transition: opacity 0.6s ease 2.4s;
+}
+
+.pioneers-section.is-visible .snake-pulse {
+  opacity: 0.95;
+}
+
+.pioneers-section.is-visible .snake-pulse--soft {
+  opacity: 0.55;
+}
+
+/* Nodi sulla linea */
+.snake-nodes,
+.snake-cards {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.snake-node {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: #0e0e11;
+  border: 2px solid #38bdf8;
+  box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.12), 0 0 14px rgba(56, 189, 248, 0.55);
+  transform: scale(0);
+  transition:
+    transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i) * 0.5s + 0.1s),
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.snake-node:nth-child(even) {
+  border-color: #c084fc;
+  box-shadow: 0 0 0 4px rgba(192, 132, 252, 0.12), 0 0 14px rgba(192, 132, 252, 0.55);
+}
+
+/* Anello pulsante discreto attorno al nodo */
+.snake-node::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  color: rgba(56, 189, 248, 0.5);
+  animation: snakeNodeRing 2.6s ease-out infinite;
+  animation-delay: calc(var(--i) * 0.4s);
+}
+
+.snake-node:nth-child(even)::after {
+  color: rgba(192, 132, 252, 0.5);
+}
+
+@keyframes snakeNodeRing {
+  0% { transform: scale(0.7); opacity: 0.9; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+
+.pioneers-section.is-visible .snake-node {
+  transform: scale(1);
+}
+
+.snake-node.is-active {
+  background: linear-gradient(135deg, #38bdf8, #c084fc);
+  box-shadow: 0 0 0 5px rgba(129, 140, 248, 0.2), 0 0 22px rgba(129, 140, 248, 0.8);
+}
+
+/* ==========================================================================
+   CARD DEI PIONIERI (FLIP 3D & CLICK RITRATTO)
+   ========================================================================== */
+
+.pioneer-card {
+  position: absolute;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  pointer-events: auto;
+  perspective: 1200px;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i) * 0.5s + 0.35s);
+}
+
+.pioneers-section.is-visible .pioneer-card {
+  opacity: 1;
+  transform: none;
+}
+
+.pioneer-card-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.pioneer-card:hover .pioneer-card-inner {
+  transform: translateY(-6px);
+}
+
+.pioneer-card.is-flipped .pioneer-card-inner {
+  transform: rotateY(180deg);
+}
+
+.pioneer-card.is-flipped:hover .pioneer-card-inner {
+  transform: translateY(-6px) rotateY(180deg);
+}
+
+.pioneer-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  border-radius: 18px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.08);
+  transition: border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.pioneer-card:hover .pioneer-face {
+  border-color: rgba(186, 230, 253, 0.45);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.7), 0 0 30px rgba(56, 189, 248, 0.22);
+}
+
+/* FRONTE: Ritratto del personaggio */
+.pioneer-front {
+  background: #14151f;
+  position: relative;
+}
+
+/* Pulsante foto: occupa tutta la card sul fronte e apre l'immagine grande */
+.pioneer-photo-btn {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  display: block;
+  position: relative;
+  cursor: zoom-in;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pioneer-photo-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+  filter: grayscale(0.12) contrast(1.05);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+}
+
+.pioneer-photo-btn:hover img,
+.pioneer-photo-btn:focus-visible img {
+  transform: scale(1.06);
+  filter: none;
+}
+
+.pioneer-photo-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(8, 8, 12, 0) 55%, rgba(8, 8, 12, 0.7) 100%),
+    radial-gradient(circle at 30% 15%, rgba(255, 255, 255, 0.14), transparent 55%);
+  pointer-events: none;
+}
+
+/* Badge zoom in alto a destra */
+.pioneer-zoom-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bae6fd;
+  background: rgba(14, 15, 23, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0.85;
+  transition: opacity var(--transition-smooth), transform var(--transition-smooth), background var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.pioneer-zoom-badge svg {
+  width: 14px;
+  height: 14px;
+}
+
+.pioneer-photo-btn:hover .pioneer-zoom-badge,
+.pioneer-photo-btn:focus-visible .pioneer-zoom-badge {
+  opacity: 1;
+  transform: scale(1.12);
+  background: rgba(56, 189, 248, 0.3);
+  border-color: rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+}
+
+/* Pulsante Spiralo (in basso a destra per girare la card) */
+.pioneer-flip-btn {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  z-index: 5;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bae6fd;
+  background: rgba(14, 15, 23, 0.82);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 10px rgba(56, 189, 248, 0.2);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.pioneer-flip-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pioneer-flip-btn:hover,
+.pioneer-flip-btn:focus-visible {
+  transform: rotate(180deg) scale(1.15);
+  background: rgba(56, 189, 248, 0.28);
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7), 0 0 18px rgba(56, 189, 248, 0.45);
+}
+
+/* RETRO: Nome, ruolo e biografia */
+.pioneer-back {
+  transform: rotateY(180deg);
+  flex-direction: column;
+  gap: 0.45em;
+  padding: 1.25em 1.15em;
+  font-size: clamp(11px, calc(var(--card-w, 220px) * 0.056), 14px);
+  background: linear-gradient(160deg, rgba(23, 25, 38, 0.98) 0%, rgba(12, 13, 20, 0.98) 100%);
+  border-color: rgba(56, 189, 248, 0.35);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(56, 189, 248, 0.4) transparent;
+  position: relative;
+}
+
+.pioneer-back::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -40%;
+  width: 90%;
+  height: 90%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.22), transparent 65%);
+  pointer-events: none;
+}
+
+.pioneer-index {
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: rgba(56, 189, 248, 0.75);
+}
+
+.pioneer-name {
+  font-size: 1.3em;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #ffffff;
+}
+
+.pioneer-role {
+  font-size: 0.78em;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pioneer-divider {
+  display: block;
+  width: 36px;
+  height: 2px;
+  margin: 0.2em 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+}
+
+.pioneer-bio {
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.74);
+  padding-bottom: 28px; /* Spazio per non sovrapporsi ai pulsanti in basso */
+}
+
+/* Pulsante rapido dal retro per aprire la foto in grande */
+.pioneer-back-zoom-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  border-radius: 20px;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #bae6fd;
+  cursor: pointer;
+  width: fit-content;
+  outline: none;
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), transform var(--transition-smooth);
+}
+
+.pioneer-back-zoom-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.pioneer-back-zoom-btn:hover,
+.pioneer-back-zoom-btn:focus-visible {
+  background: rgba(56, 189, 248, 0.22);
+  border-color: rgba(56, 189, 248, 0.65);
+  transform: translateY(-2px);
+}
+
+/* Spiralo di ritorno sul retro */
+.pioneer-flip-back-btn {
+  background: rgba(20, 21, 32, 0.88);
+  border-color: rgba(192, 132, 252, 0.45);
+}
+
+.pioneer-flip-back-btn:hover,
+.pioneer-flip-back-btn:focus-visible {
+  border-color: rgba(192, 132, 252, 0.85);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7), 0 0 18px rgba(192, 132, 252, 0.45);
+}
+
+/* ==========================================================================
+   SPOTLIGHT HERO MODAL DEI PIONIERI (VISUALIZZAZIONE INGRANDITA)
+   ========================================================================== */
+
+.pioneer-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 320ms cubic-bezier(0.16, 1, 0.3, 1), visibility 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 24px;
+}
+
+.pioneer-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.pioneer-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 7, 12, 0.88);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  cursor: pointer;
+}
+
+.pioneer-modal-wrapper {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pioneer-modal-card {
+  position: relative;
+  width: 100%;
+  background: rgba(14, 15, 24, 0.94);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.9), 0 0 50px rgba(56, 189, 248, 0.18);
+  overflow: hidden;
+  transform: scale(0.92) translateY(16px);
+  transition: transform 340ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pioneer-modal.is-open .pioneer-modal-card {
+  transform: scale(1) translateY(0);
+}
+
+/* Pulsante di chiusura */
+.pioneer-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  cursor: pointer;
+  z-index: 10;
+  outline: none;
+  transition: background var(--transition-smooth), transform var(--transition-smooth), border-color var(--transition-smooth);
+}
+
+.pioneer-modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pioneer-modal-close:hover,
+.pioneer-modal-close:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(56, 189, 248, 0.6);
+  transform: scale(1.08);
+}
+
+/* Frecce di navigazione */
+.pioneer-modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 15, 23, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #bae6fd;
+  cursor: pointer;
+  z-index: 10;
+  outline: none;
+  transition: background var(--transition-smooth), border-color var(--transition-smooth), transform var(--transition-smooth), box-shadow var(--transition-smooth);
+}
+
+.pioneer-modal-prev {
+  left: 14px;
+}
+
+.pioneer-modal-next {
+  right: 14px;
+}
+
+.pioneer-modal-nav svg {
+  width: 20px;
+  height: 20px;
+}
+
+.pioneer-modal-nav:hover,
+.pioneer-modal-nav:focus-visible {
+  background: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.7);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+}
+
+.pioneer-modal-prev:hover {
+  transform: translateY(-50%) translateX(-2px);
+}
+
+.pioneer-modal-next:hover {
+  transform: translateY(-50%) translateX(2px);
+}
+
+/* Corpo del modal: layout a 2 colonne su desktop */
+.pioneer-modal-body {
+  display: flex;
+  padding: 36px 52px;
+  gap: 36px;
+  align-items: center;
+}
+
+/* Colonna sinistra: ritratto in risalto */
+.pioneer-modal-media {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.pioneer-modal-frame {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.16);
+  background: #0e0f18;
+}
+
+.pioneer-modal-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  display: block;
+}
+
+.pioneer-modal-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #bae6fd;
+}
+
+/* Colonna destra: info e biografia */
+.pioneer-modal-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pioneer-modal-eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.pioneer-modal-name {
+  font-size: clamp(24px, 3.2vw, 34px);
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.15;
+}
+
+.pioneer-modal-divider {
+  width: 48px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #38bdf8, #c084fc);
+  margin: 6px 0 12px;
+}
+
+.pioneer-modal-bio {
+  font-size: 15px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 400;
+}
+
+@media (max-width: 820px) {
+  .pioneer-modal-body {
+    flex-direction: column;
+    padding: 32px 24px 28px;
+    gap: 20px;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+
+  .pioneer-modal-media {
+    flex: none;
+    width: 100%;
+    max-width: 240px;
+  }
+
+  .pioneer-modal-frame {
+    height: 270px;
+  }
+
+  .pioneer-modal-prev {
+    left: 8px;
+  }
+
+  .pioneer-modal-next {
+    right: 8px;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE E ACCESSIBILITÀ
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .scroll-cue {
+    right: 16px;
+    bottom: 16px;
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snake-path,
+  .snake-path-glow,
+  .snake-node,
+  .pioneer-card,
+  .pioneers-header {
+    transition: none;
+  }
+
+  .pioneer-card-inner {
+    transition-duration: 0.01s;
+  }
+
+  .scroll-cue svg,
+  .snake-node::after {
+    animation: none;
+  }
+}
