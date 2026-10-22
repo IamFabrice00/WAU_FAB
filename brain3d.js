@@ -113,9 +113,9 @@
       this.brainGroup = new THREE.Group();
       this.scene.add(this.brainGroup);
 
-      // 3. Camera Prospettica
+      // 3. Camera Prospettica (allineata perfettamente al centro dell'origine)
       this.camera = new THREE.PerspectiveCamera(CONFIG.fov, 1, 0.1, 100);
-      this.camera.position.set(0, 0.15, CONFIG.cameraZ);
+      this.camera.position.set(0, 0, CONFIG.cameraZ);
       this.camera.lookAt(0, 0, 0);
 
       // 4. Illuminazione interna ed esterna
@@ -235,7 +235,7 @@
 
         // Coordinate scalate secondo proporzioni biologiche umane
         const x = sign * absX * 0.96 * radialMod * depth;
-        const y = (ny * 0.90 + 0.08) * radialMod * depth;
+        const y = ny * 0.92 * radialMod * depth;
         const z = nz * 1.20 * radialMod * depth;
 
         positions[i * 3] = x;
@@ -270,6 +270,20 @@
         sizes[i] = isSurface ? (0.055 + Math.random() * 0.035) : (0.04 + Math.random() * 0.025);
         pulsePhases[i] = Math.random() * Math.PI * 2;
         pulseSpeeds[i] = 1.5 + Math.random() * 2.5;
+      }
+
+      // Centratura baricentrica esatta del volume 3D rispetto all'origine (0, 0, 0)
+      let minY = Infinity, maxY = -Infinity;
+      for (let i = 0; i < count; i++) {
+        const cy = positions[i * 3 + 1];
+        if (cy < minY) minY = cy;
+        if (cy > maxY) maxY = cy;
+      }
+      const offsetY = (minY + maxY) / 2;
+      for (let i = 0; i < count; i++) {
+        positions[i * 3 + 1] -= offsetY;
+        originalPositions[i * 3 + 1] -= offsetY;
+        pointsArray[i].y -= offsetY;
       }
 
       this.originalPositions = originalPositions;
@@ -378,7 +392,7 @@
 
         // Deforma secondo la sagoma del cervello
         x = x * 1.05;
-        y = y * 0.95 + 0.05;
+        y = y * 0.95;
         z = z * 1.25;
 
         pos.setXYZ(i, x, y, z);
@@ -571,7 +585,7 @@
 
       // 2. Rotazione continua del cervello nello spazio 3D
       this.brainGroup.rotation.y += CONFIG.baseRotationSpeed;
-      this.brainGroup.rotation.x = this.mouse.y * 0.35 + Math.sin(time * 0.8) * 0.04;
+      this.brainGroup.rotation.x = this.mouse.y * 0.35 + Math.sin(time * 0.8) * 0.02;
       this.brainGroup.rotation.z = -this.mouse.x * 0.25;
 
       // Se un nodo è in hover, orienta leggermente il cervello verso quel nodo
@@ -673,6 +687,20 @@
         cancelAnimationFrame(this.animId);
         this.animId = null;
       }
+    }
+
+    /**
+     * Ridimensiona la viewport WebGL e adatta la matrice prospettica
+     */
+    resize(newSize) {
+      if (!this.renderer || !this.camera || !newSize) return;
+      this.width = newSize;
+      this.height = newSize;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.renderer.setPixelRatio(dpr);
+      this.renderer.setSize(newSize, newSize, false);
+      this.camera.aspect = 1;
+      this.camera.updateProjectionMatrix();
     }
 
     /**

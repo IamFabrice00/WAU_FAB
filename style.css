@@ -49,6 +49,8 @@ html, body {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  min-height: -webkit-fill-available;
   overflow: hidden;
   cursor: grab;
   display: flex;
@@ -736,5 +738,17 @@ html, body {
     right: 16px;
     width: 38px;
     height: 38px;
+  }
+
+  /* Badge HUD WAU TECH perfettamente bilanciato al centro del cervello su mobile */
+  .brain-hud-badge {
+    bottom: -11px;
+    padding: 3px 10px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(56, 189, 248, 0.2);
+  }
+
+  .brain-hud-text {
+    font-size: 9.5px;
+    letter-spacing: 1px;
   }
 }

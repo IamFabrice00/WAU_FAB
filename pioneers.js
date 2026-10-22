@@ -202,6 +202,9 @@
     const node = nodeEls[index];
     if (!card) return;
 
+    // Eleva temporaneamente lo z-index durante la rotazione per rimanere sempre in primo piano
+    card.style.zIndex = '35';
+
     const isFlipped = (typeof forceFlipped === 'boolean') 
       ? card.classList.toggle('is-flipped', forceFlipped) 
       : card.classList.toggle('is-flipped');
@@ -209,6 +212,15 @@
     if (node) {
       node.classList.toggle('is-active', isFlipped);
     }
+
+    // Al termine della transizione (800ms) consolida lo z-index
+    setTimeout(() => {
+      if (card.classList.contains('is-flipped')) {
+        card.style.zIndex = '25';
+      } else {
+        card.style.zIndex = '';
+      }
+    }, 820);
   }
 
   // ==========================================================================
